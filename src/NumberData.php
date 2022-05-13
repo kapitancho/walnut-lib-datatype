@@ -15,13 +15,13 @@ use Walnut\Lib\DataType\Exception\NumberType\{
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class NumberData implements ValueValidator {
 	public function __construct(
-		public /*readonly*/ bool $nullable = false,
-		public /*readonly*/ ?float $minimum = null,
-		public /*readonly*/ bool $exclusiveMinimum = false,
-		public /*readonly*/ ?float $maximum = null,
-		public /*readonly*/ bool $exclusiveMaximum = false,
-		public /*readonly*/ ?float $multipleOf = null,
-		public /*readonly*/ ?string $format = null,
+		public readonly bool $nullable = false,
+		public readonly ?float $minimum = null,
+		public readonly bool $exclusiveMinimum = false,
+		public readonly ?float $maximum = null,
+		public readonly bool $exclusiveMaximum = false,
+		public readonly ?float $multipleOf = null,
+		public readonly ?string $format = null,
 	) {
 		if (isset($this->minimum, $this->maximum) && $this->minimum > $this->maximum) {
 			throw new InvalidValueRange($this->minimum, $this->maximum);

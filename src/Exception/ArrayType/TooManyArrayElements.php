@@ -10,8 +10,8 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class TooManyArrayElements extends InvalidValue {
 	private const ERROR_MESSAGE = "The number of elements in the array '%d' is more than the maximal required '%d' elements.";
 	public function __construct(
-		public /*readonly*/ int $maxItems,
-		public /*readonly*/ int $actualItemsCount
+		public readonly int $maxItems,
+		public readonly int $actualItemsCount
 	) {
 		parent::__construct();
 	}

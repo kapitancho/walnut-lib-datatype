@@ -10,7 +10,7 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class RequiredObjectPropertyMissing extends InvalidValue {
 	private const ERROR_MESSAGE = "The required property '%s' is missing.";
 	public function __construct(
-		public /*readonly*/ string $propertyName
+		public readonly string $propertyName
 	) {
 		parent::__construct();
 	}

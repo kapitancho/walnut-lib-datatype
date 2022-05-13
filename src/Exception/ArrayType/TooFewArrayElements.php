@@ -10,8 +10,8 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class TooFewArrayElements extends InvalidValue {
 	private const ERROR_MESSAGE = "The number of elements in the array '%d' is less than the minimal required '%d' elements.";
 	public function __construct(
-		public /*readonly*/ int $minItems,
-		public /*readonly*/ int $actualItemsCount
+		public readonly int $minItems,
+		public readonly int $actualItemsCount
 	) {
 		parent::__construct();
 	}

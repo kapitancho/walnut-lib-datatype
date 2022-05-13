@@ -15,8 +15,8 @@ final class StringNotInEnum extends InvalidValue {
 	 * @param string $value
 	 */
 	public function __construct(
-		public /*readonly*/ array $enumValues,
-		public /*readonly*/ string $value
+		public readonly array $enumValues,
+		public readonly string $value
 	) {
 		parent::__construct();
 	}

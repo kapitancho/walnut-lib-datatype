@@ -11,8 +11,8 @@ use OutOfBoundsException;
 final class InvalidValueRange extends OutOfBoundsException {
 	private const ERROR_MESSAGE = "The range '%f' - '%f' is invalid.";
 	public function __construct(
-		public /*readonly*/ int|float $rangeMin,
-		public /*readonly*/ int|float $rangeMax
+		public readonly int|float $rangeMin,
+		public readonly int|float $rangeMax
 	) {
 		parent::__construct();
 	}

@@ -10,8 +10,8 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class StringIncorrectlyFormatted extends InvalidValue {
 	private const ERROR_MESSAGE = "The string '%s' is not in format '%s'.";
 	public function __construct(
-		public /*readonly*/ string $format,
-		public /*readonly*/ string $value
+		public readonly string $format,
+		public readonly string $value
 	) {
 		parent::__construct();
 	}

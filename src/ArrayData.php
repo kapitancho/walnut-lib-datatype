@@ -15,10 +15,10 @@ use Walnut\Lib\DataType\Exception\{InvalidValueRange, InvalidValueType};
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class ArrayData implements ValueValidator {
 	public function __construct(
-		public /*readonly*/ bool $nullable = false,
-		public /*readonly*/ ?int $minItems = null,
-		public /*readonly*/ ?int $maxItems = null,
-		public /*readonly*/ bool $uniqueItems = false
+		public readonly bool $nullable = false,
+		public readonly ?int $minItems = null,
+		public readonly ?int $maxItems = null,
+		public readonly bool $uniqueItems = false
 	) {
 		if (isset($this->minItems, $this->maxItems) && $this->minItems > $this->maxItems) {
 			throw new InvalidValueRange($this->minItems, $this->maxItems);

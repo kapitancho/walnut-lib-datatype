@@ -23,11 +23,11 @@ final class ObjectData implements ValueValidator {
 	 * @param string|null $additionalPropertiesIn
 	 */
 	public function __construct(
-		public /*readonly*/ bool $nullable = false,
-		public /*readonly*/ array $required = [],
-		public /*readonly*/ ?int $minProperties = null,
-		public /*readonly*/ ?int $maxProperties = null,
-		public /*readonly*/ ?string $additionalPropertiesIn = null
+		public readonly bool $nullable = false,
+		public readonly array $required = [],
+		public readonly ?int $minProperties = null,
+		public readonly ?int $maxProperties = null,
+		public readonly ?string $additionalPropertiesIn = null
 	) { 
 		if (isset($this->minProperties, $this->maxProperties) && $this->minProperties > $this->maxProperties) {
 			throw new InvalidValueRange($this->minProperties, $this->maxProperties);

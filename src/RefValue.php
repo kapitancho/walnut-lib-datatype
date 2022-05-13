@@ -15,8 +15,8 @@ final class RefValue implements ValueValidator {
 	 * @param class-string $targetClass
 	 */
 	public function __construct(
-		public /*readonly*/ string $targetClass,
-		public /*readonly*/ bool $nullable = false
+		public readonly string $targetClass,
+		public readonly bool $nullable = false
 	) {}
 
 	/**

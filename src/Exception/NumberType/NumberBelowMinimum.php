@@ -11,9 +11,9 @@ final class NumberBelowMinimum extends InvalidValue {
 	private const ERROR_MESSAGE = "The value '%f' cannot be%s less than '%f'.";
 	private const EQUAL_OR = " equal or";
 	public function __construct(
-		public /*readonly*/ float $minimum,
-		public /*readonly*/ bool $exclusiveMinimum,
-		public /*readonly*/ float $actualValue
+		public readonly float $minimum,
+		public readonly bool $exclusiveMinimum,
+		public readonly float $actualValue
 	) {
 		parent::__construct();
 	}

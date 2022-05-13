@@ -10,8 +10,8 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class TooFewObjectProperties extends InvalidValue {
 	private const ERROR_MESSAGE = "The number of properties in the object '%d' is less than the minimal allowed '%d' properties.";
 	public function __construct(
-		public /*readonly*/ int $minProperties,
-		public /*readonly*/ int $actualPropertiesCount
+		public readonly int $minProperties,
+		public readonly int $actualPropertiesCount
 	) {
 		parent::__construct();
 	}

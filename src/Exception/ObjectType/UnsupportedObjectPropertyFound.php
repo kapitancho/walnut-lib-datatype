@@ -10,7 +10,7 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class UnsupportedObjectPropertyFound extends InvalidValue {
 	private const ERROR_MESSAGE = "An unsupported property '%s' was found.";
 	public function __construct(
-		public /*readonly*/ string $propertyName
+		public readonly string $propertyName
 	) {
 		parent::__construct();
 	}

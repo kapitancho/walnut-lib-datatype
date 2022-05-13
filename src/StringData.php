@@ -26,12 +26,12 @@ final class StringData implements ValueValidator {
 	 * @param string[]|null $enum
 	 */
 	public function __construct(
-		public /*readonly*/ bool $nullable = false,
-		public /*readonly*/ ?int $minLength = null,
-		public /*readonly*/ ?int $maxLength = null,
-		public /*readonly*/ ?string $format = null,
-		public /*readonly*/ ?string $pattern = null,
-		public /*readonly*/ ?array $enum = null
+		public readonly bool $nullable = false,
+		public readonly ?int $minLength = null,
+		public readonly ?int $maxLength = null,
+		public readonly ?string $format = null,
+		public readonly ?string $pattern = null,
+		public readonly ?array $enum = null
 	) {
 		if (isset($this->minLength, $this->maxLength) && $this->minLength > $this->maxLength) {
 			throw new InvalidValueRange($this->minLength, $this->maxLength);

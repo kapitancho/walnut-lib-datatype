@@ -10,8 +10,8 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class NumberNotMultipleOf extends InvalidValue {
 	private const ERROR_MESSAGE = "The value '%f' should be a multiple of '%f'.";
 	public function __construct(
-		public /*readonly*/ float $multipleOf,
-		public /*readonly*/ float $actualValue
+		public readonly float $multipleOf,
+		public readonly float $actualValue
 	) {
 		parent::__construct();
 	}

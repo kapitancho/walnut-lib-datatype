@@ -12,7 +12,7 @@ use Walnut\Lib\DataType\Exception\InvalidValueType;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class BooleanData implements ValueValidator {
 	public function __construct(
-		public /*readonly*/ bool $nullable = false,
+		public readonly bool $nullable = false,
 	) {}
 
 	/**

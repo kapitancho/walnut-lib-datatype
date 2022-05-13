@@ -11,9 +11,9 @@ final class NumberAboveMaximum extends InvalidValue {
 	private const ERROR_MESSAGE = "The value '%f' cannot be%s over '%f'.";
 	private const EQUAL_OR = " equal or";
 	public function __construct(
-		public /*readonly*/ float $maximum,
-		public /*readonly*/ bool $exclusiveMaximum,
-		public /*readonly*/ float $actualValue
+		public readonly float $maximum,
+		public readonly bool $exclusiveMaximum,
+		public readonly float $actualValue
 	) {
 		parent::__construct();
 	}

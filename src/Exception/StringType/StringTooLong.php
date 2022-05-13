@@ -10,8 +10,8 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class StringTooLong extends InvalidValue {
 	private const ERROR_MESSAGE = "The length of the string '%d' is more than the maximal allowed length of '%d'.";
 	public function __construct(
-		public /*readonly*/ int $maxLength,
-		public /*readonly*/ int $actualLength
+		public readonly int $maxLength,
+		public readonly int $actualLength
 	) {
 		parent::__construct();
 	}

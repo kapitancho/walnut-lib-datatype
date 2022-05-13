@@ -10,8 +10,8 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class TooManyObjectProperties extends InvalidValue {
 	private const ERROR_MESSAGE = "The number of properties in the object '%d' is more than the maximal allowed '%d' properties.";
 	public function __construct(
-		public /*readonly*/ int $maxProperties,
-		public /*readonly*/ int $actualPropertiesCount
+		public readonly int $maxProperties,
+		public readonly int $actualPropertiesCount
 	) {
 		parent::__construct();
 	}

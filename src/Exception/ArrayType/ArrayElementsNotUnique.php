@@ -10,7 +10,7 @@ use Walnut\Lib\DataType\Exception\InvalidValue;
 final class ArrayElementsNotUnique extends InvalidValue {
 	private const ERROR_MESSAGE = "All elements should be unique. '%d' of them are duplicated.";
 	public function __construct(
-		public /*readonly*/ int $duplicatedCount
+		public readonly int $duplicatedCount
 	) {
 		parent::__construct();
 	}
