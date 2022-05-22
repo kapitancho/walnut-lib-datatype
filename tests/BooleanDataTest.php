@@ -1,35 +1,38 @@
 <?php
 
-namespace Walnut\Lib\DataType;
+namespace Walnut\Lib\DataType\Importer;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lib\DataType\Exception\InvalidValueRange;
+use Walnut\Lib\DataType\BooleanData;
+use Walnut\Lib\DataType\CompositeValueHydrator;
 use Walnut\Lib\DataType\Exception\InvalidValueType;
-use Walnut\Lib\DataType\Exception\BooleanType\BooleanAboveMaximum;
-use Walnut\Lib\DataType\Exception\BooleanType\BooleanBelowMinimum;
-use Walnut\Lib\DataType\Exception\BooleanType\BooleanNotMultipleOf;
 
 final class BooleanDataTest extends TestCase {
 
+	protected function setUp(): void {
+		$this->importer = $this->createMock(CompositeValueHydrator::class);
+	}
+
+	public function testTrue(): void {
+		$this->assertTrue( (new BooleanData)->importValue(true, $this->importer));
+	}
+
+	public function testFalse(): void {
+		$this->assertFalse((new BooleanData)->importValue(false, $this->importer));
+	}
+
 	public function testInvalidValueType(): void {
 		$this->expectException(InvalidValueType::class);
-		(new BooleanData)->validateValue("TEST");
+		(new BooleanData)->importValue("TEST", $this->importer);
 	}
 
 	public function testAllowNull(): void {
-		$this->expectNotToPerformAssertions();
-		(new BooleanData(nullable: true))->validateValue(null);
+		$this->assertNull((new BooleanData(nullable: true))->importValue(null, $this->importer));
 	}
 
 	public function testDisallowNull(): void {
 		$this->expectException(InvalidValueType::class);
-		(new BooleanData)->validateValue(null);
-	}
-
-	public function testValues(): void {
-		$this->expectNotToPerformAssertions();
-		(new BooleanData)->validateValue(true);
-		(new BooleanData)->validateValue(false);
+		(new BooleanData)->importValue(null, $this->importer);
 	}
 
 }

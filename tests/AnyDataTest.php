@@ -1,36 +1,38 @@
 <?php
 
-namespace Walnut\Lib\DataType;
+namespace Walnut\Lib\DataType\Importer;
 
 use PHPUnit\Framework\TestCase;
-use Walnut\Lib\DataType\Exception\InvalidValueRange;
+use Walnut\Lib\DataType\AnyData;
+use Walnut\Lib\DataType\CompositeValueHydrator;
 use Walnut\Lib\DataType\Exception\InvalidValueType;
-use Walnut\Lib\DataType\Exception\AnyType\AnyAboveMaximum;
-use Walnut\Lib\DataType\Exception\AnyType\AnyBelowMinimum;
-use Walnut\Lib\DataType\Exception\AnyType\AnyNotMultipleOf;
 
 final class AnyDataTest extends TestCase {
 
+	protected function setUp(): void {
+		$this->importer = $this->createMock(CompositeValueHydrator::class);
+	}
+	
 	public function testAllowNull(): void {
-		$this->expectNotToPerformAssertions();
-		(new AnyData(nullable: true))->validateValue(null);
+		$this->assertNull((new AnyData(nullable: true))
+			->importValue(null, $this->importer));
 	}
 
 	public function testDisallowNull(): void {
 		$this->expectException(InvalidValueType::class);
-		(new AnyData)->validateValue(null);
+		(new AnyData)->importValue(null, $this->importer);
 	}
 
 	public function testValues(): void {
 		$this->expectNotToPerformAssertions();
-		(new AnyData)->validateValue(true);
-		(new AnyData)->validateValue(false);
-		(new AnyData)->validateValue(0);
-		(new AnyData)->validateValue(0.5);
-		(new AnyData)->validateValue("STRING");
-		(new AnyData)->validateValue([]);
-		(new AnyData)->validateValue([1]);
-		(new AnyData)->validateValue(new \stdClass);
+		(new AnyData)->importValue(true, $this->importer);
+		(new AnyData)->importValue(false, $this->importer);
+		(new AnyData)->importValue(0, $this->importer);
+		(new AnyData)->importValue(0.5, $this->importer);
+		(new AnyData)->importValue("STRING", $this->importer);
+		(new AnyData)->importValue([], $this->importer);
+		(new AnyData)->importValue([1], $this->importer);
+		(new AnyData)->importValue(new \stdClass, $this->importer);
 	}
 
 }

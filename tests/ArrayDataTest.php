@@ -1,15 +1,26 @@
 <?php
 
-namespace Walnut\Lib\DataType;
+namespace Walnut\Lib\DataType\Importer;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lib\DataType\ArrayData;
+use Walnut\Lib\DataType\CompositeValueHydrator;
 use Walnut\Lib\DataType\Exception\ArrayType\ArrayElementsNotUnique;
 use Walnut\Lib\DataType\Exception\ArrayType\TooFewArrayElements;
 use Walnut\Lib\DataType\Exception\ArrayType\TooManyArrayElements;
+use Walnut\Lib\DataType\Exception\InvalidData;
 use Walnut\Lib\DataType\Exception\InvalidValueRange;
 use Walnut\Lib\DataType\Exception\InvalidValueType;
 
 final class ArrayDataTest extends TestCase {
+
+	protected function setUp(): void {
+		$this->importer = $this->createMock(CompositeValueHydrator::class);
+	}
+
+	public function testEmptyArray(): void {
+		$this->assertEquals([], (new ArrayData)->importValue([], $this->importer));
+	}
 
 	public function testInvalidValueRange(): void {
 		$this->expectException(InvalidValueRange::class);
@@ -18,58 +29,69 @@ final class ArrayDataTest extends TestCase {
 
 	public function testInvalidValueType(): void {
 		$this->expectException(InvalidValueType::class);
-		(new ArrayData)->validateValue(5);
+		(new ArrayData)->importValue(5, $this->importer);
+	}
+
+	public function testInvalidArrayType(): void {
+		$this->expectException(InvalidValueType::class);
+		(new ArrayData)->importValue(['a' => 'b'], $this->importer);
 	}
 
 	public function testAllowNull(): void {
-		$this->expectNotToPerformAssertions();
-		(new ArrayData(nullable: true))->validateValue(null);
+		$this->assertNull((new ArrayData(nullable: true))->importValue(null, $this->importer));
 	}
 
 	public function testDisallowNull(): void {
 		$this->expectException(InvalidValueType::class);
-		(new ArrayData)->validateValue(null);
+		(new ArrayData)->importValue(null, $this->importer);
 	}
 
 	public function testTooFewOk(): void {
-		$this->expectNotToPerformAssertions();
-		(new ArrayData(minItems: 3))->validateValue([1, 2, 3]);
-		(new ArrayData(minItems: 3))->validateValue([1, 2, 3, 4]);
+		$this->assertIsArray((new ArrayData(minItems: 3))->importValue([1, 2, 3], $this->importer));
+		$this->assertIsArray((new ArrayData(minItems: 3))->importValue([1, 2, 3, 4], $this->importer));
 	}
 
 	public function testTooFewError(): void {
 		$this->expectException(TooFewArrayElements::class);
-		(new ArrayData(minItems: 3))->validateValue([1, 2]);
+		(new ArrayData(minItems: 3))->importValue([1, 2], $this->importer);
 	}
 
 	public function testTooManyOk(): void {
-		$this->expectNotToPerformAssertions();
-		(new ArrayData(maxItems: 3))->validateValue([1, 2, 3]);
-		(new ArrayData(maxItems: 3))->validateValue([1, 2]);
+		$this->assertIsArray((new ArrayData(maxItems: 3))->importValue([1, 2, 3], $this->importer));
+		$this->assertIsArray((new ArrayData(maxItems: 3))->importValue([1, 2], $this->importer));
 	}
 
 	public function testTooManyError(): void {
 		$this->expectException(TooManyArrayElements::class);
-		(new ArrayData(maxItems: 3))->validateValue([1, 2, 3, 4]);
+		(new ArrayData(maxItems: 3))->importValue([1, 2, 3, 4], $this->importer);
 	}
 
 	public function testInRange(): void {
-		$this->expectNotToPerformAssertions();
-		(new ArrayData(minItems: 1, maxItems: 3))->validateValue([1, 2]);
+		$this->assertIsArray((new ArrayData(minItems: 1, maxItems: 3))->importValue([1, 2], $this->importer));
 	}
 
 	public function testUnique(): void {
-		$this->expectNotToPerformAssertions();
 		//No uniqueness requirement
-		(new ArrayData(uniqueItems: false))->validateValue([1, 1, 2]);
+		$this->assertIsArray((new ArrayData(uniqueItems: false))->importValue([1, 1, 2], $this->importer));
 		//Unique elements
-		(new ArrayData(uniqueItems: true))->validateValue([1, 2, 3]);
+		$this->assertIsArray((new ArrayData(uniqueItems: true))->importValue([1, 2, 3], $this->importer));
 
 	}
 
 	public function testArrayElementsNotUnique(): void {
 		$this->expectException(ArrayElementsNotUnique::class);
-		(new ArrayData(uniqueItems: true))->validateValue([1, 1, 2]);
+		(new ArrayData(uniqueItems: true))->importValue([1, 1, 2], $this->importer);
+	}
+
+	public function testItemsOk(): void {
+		$this->importer->method('importNestedValue')->willReturn(1);
+		$this->assertIsArray((new ArrayData)->importValue([1, 1, 2], $this->importer));
+	}
+
+	public function testInvalidItems(): void {
+		$this->importer->method('importNestedValue')->willThrowException(new InvalidData("path", 'value', new InvalidValueType('a', 'b')));
+		$this->expectException(InvalidData::class);
+		(new ArrayData)->importValue([1, 2, 3], $this->importer);
 	}
 
 }

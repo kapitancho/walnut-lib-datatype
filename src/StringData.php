@@ -3,17 +3,19 @@
 namespace Walnut\Lib\DataType;
 
 use Attribute;
-use Walnut\Lib\DataType\Exception\{InvalidValueRange, InvalidValueType};
-use Walnut\Lib\DataType\Exception\StringType\{
-	StringIncorrectlyFormatted, StringNotInEnum, StringTooLong, StringTooShort
-};
+use Walnut\Lib\DataType\Exception\{InvalidValueRange};
+use Walnut\Lib\DataType\Exception\InvalidValueType;
+use Walnut\Lib\DataType\Exception\StringType\{StringTooLong};
+use Walnut\Lib\DataType\Exception\StringType\StringIncorrectlyFormatted;
+use Walnut\Lib\DataType\Exception\StringType\StringNotInEnum;
+use Walnut\Lib\DataType\Exception\StringType\StringTooShort;
 
 /**
  * @package Walnut\Lib\DataType
  * @readonly
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-final class StringData implements ValueValidator {
+final class StringData implements DirectValue {
 	public const DATE_TIME_REGEXP = '#^(\d+)-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+|\-]([01]\d|2[0-3])))$#';
 	public const FORMAT_DATE_TIME = 'date-time';
 
@@ -39,23 +41,25 @@ final class StringData implements ValueValidator {
 	}
 
 	/**
-	 * @param mixed $value
-	 * @throws InvalidValueType
-	 * @throws StringTooShort
-	 * @throws StringTooLong
-	 * @throws StringIncorrectlyFormatted
-	 * @throws StringNotInEnum
+	 * @throws InvalidValueType|StringTooShort|StringTooLong|StringIncorrectlyFormatted|StringNotInEnum
 	 */
-	public function validateValue(mixed $value): void {
+	public function importValue(
+		null|string|float|int|bool|array|object $value
+	): ?string {
 		if (!is_string($value) && !($value === null && $this->nullable)) {
 			throw new InvalidValueType('string', gettype($value));
 		}
-		if (isset($value)) {
-			$l = mb_strlen($value);
-			$this->tooShort($l)->tooLong($l)->notInEnum($value)->wrongFormat($value);
+		if (!isset($value)) {
+			return null;
 		}
+		$l = mb_strlen($value);
+		$this->tooShort($l)->tooLong($l)->notInEnum($value)->wrongFormat($value);
+		return $value;
 	}
 
+	/**
+	 * @throws StringTooShort
+	 */
 	private function tooShort(int $l): self {
 		if (isset($this->minLength) && $l < $this->minLength) {
 			throw new StringTooShort($this->minLength, $l);
@@ -63,6 +67,9 @@ final class StringData implements ValueValidator {
 		return $this;
 	}
 
+	/**
+	 * @throws StringTooLong
+	 */
 	private function tooLong(int $l): self {
 		if (isset($this->maxLength) && $l > $this->maxLength) {
 			throw new StringTooLong($this->maxLength, $l);
@@ -70,6 +77,9 @@ final class StringData implements ValueValidator {
 		return $this;
 	}
 
+	/**
+	 * @throws StringNotInEnum
+	 */
 	private function notInEnum(string $value): self {
 		if (isset($this->enum) && !in_array($value, $this->enum, true)) {
 			throw new StringNotInEnum($this->enum, $value);
@@ -77,6 +87,9 @@ final class StringData implements ValueValidator {
 		return $this;
 	}
 
+	/**
+	 * @throws StringIncorrectlyFormatted
+	 */
 	private function wrongFormat(string $value): self {
 		if (isset($this->format)) {
 			switch ($this->format) {

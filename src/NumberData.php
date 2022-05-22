@@ -3,17 +3,18 @@
 namespace Walnut\Lib\DataType;
 
 use Attribute;
-use Walnut\Lib\DataType\Exception\{InvalidValueRange, InvalidValueType};
-use Walnut\Lib\DataType\Exception\NumberType\{
-	NumberAboveMaximum, NumberBelowMinimum, NumberNotMultipleOf
-};
+use Walnut\Lib\DataType\Exception\{InvalidValueRange};
+use Walnut\Lib\DataType\Exception\InvalidValueType;
+use Walnut\Lib\DataType\Exception\NumberType\{NumberBelowMinimum};
+use Walnut\Lib\DataType\Exception\NumberType\NumberAboveMaximum;
+use Walnut\Lib\DataType\Exception\NumberType\NumberNotMultipleOf;
 
 /**
  * @package Walnut\Lib\DataType
  * @readonly
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class NumberData implements ValueValidator {
+class NumberData implements DirectValue {
 	public function __construct(
 		public readonly bool $nullable = false,
 		public readonly ?float $minimum = null,
@@ -29,13 +30,21 @@ class NumberData implements ValueValidator {
 	}
 
 	/**
-	 * @param mixed $value
-	 * @throws InvalidValueType
-	 * @throws NumberAboveMaximum
-	 * @throws NumberBelowMinimum
-	 * @throws NumberNotMultipleOf
+	 * @throws InvalidValueType|NumberAboveMaximum|NumberBelowMinimum|NumberNotMultipleOf
 	 */
-	public function validateValue(mixed $value): void {
+	public function importValue(
+		null|string|float|int|bool|array|object $value
+	): null|float|int {
+		$this->validateValue($value);
+		return isset($value) ? (float)$value : null;
+	}
+
+	/**
+	 * @throws InvalidValueType|NumberAboveMaximum|NumberBelowMinimum|NumberNotMultipleOf
+	 */
+	protected function validateValue(
+		null|string|float|int|bool|array|object $value
+	): void {
 		if (!is_float($value) && !is_int($value) && !($value === null && $this->nullable)) {
 			throw new InvalidValueType('double', gettype($value));
 		}
@@ -44,6 +53,9 @@ class NumberData implements ValueValidator {
 		}
 	}
 
+	/**
+	 * @throws NumberBelowMinimum
+	 */
 	private function tooSmall(int|float $value): self {
 		if (isset($this->minimum)) {
 			if ($value < $this->minimum || ((float)$value === $this->minimum && $this->exclusiveMinimum)) {
@@ -53,6 +65,9 @@ class NumberData implements ValueValidator {
 		return $this;
 	}
 
+	/**
+	 * @throws NumberAboveMaximum
+	 */
 	private function tooLarge(int|float $value): self {
 		if (isset($this->maximum)) {
 			if ($value > $this->maximum || ((float)$value === $this->maximum && $this->exclusiveMaximum)) {
@@ -62,6 +77,9 @@ class NumberData implements ValueValidator {
 		return $this;
 	}
 
+	/**
+	 * @throws NumberNotMultipleOf
+	 */
 	private function notMultipleOf(int|float $value): self {
 		if (isset($this->multipleOf) && $value % $this->multipleOf) {
 			throw new NumberNotMultipleOf($this->multipleOf, $value);

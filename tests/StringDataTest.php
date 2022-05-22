@@ -1,16 +1,22 @@
 <?php
 
-namespace Walnut\Lib\DataType;
+namespace Walnut\Lib\DataType\Importer;
 
 use PHPUnit\Framework\TestCase;
+use Walnut\Lib\DataType\CompositeValueHydrator;
 use Walnut\Lib\DataType\Exception\InvalidValueRange;
 use Walnut\Lib\DataType\Exception\InvalidValueType;
 use Walnut\Lib\DataType\Exception\StringType\StringIncorrectlyFormatted;
 use Walnut\Lib\DataType\Exception\StringType\StringNotInEnum;
 use Walnut\Lib\DataType\Exception\StringType\StringTooLong;
 use Walnut\Lib\DataType\Exception\StringType\StringTooShort;
+use Walnut\Lib\DataType\StringData;
 
 final class StringDataTest extends TestCase {
+
+	protected function setUp(): void {
+		$this->importer = $this->createMock(CompositeValueHydrator::class);
+	}
 
 	public function testInvalidValueRange(): void {
 		$this->expectException(InvalidValueRange::class);
@@ -19,72 +25,71 @@ final class StringDataTest extends TestCase {
 
 	public function testInvalidValueType(): void {
 		$this->expectException(InvalidValueType::class);
-		(new StringData)->validateValue(5);
+		(new StringData)->importValue(5, $this->importer);
+	}
+
+	public function testString(): void {
+		$this->assertEquals('test', (new StringData)->importValue('test', $this->importer));
 	}
 
 	public function testAllowNull(): void {
-		$this->expectNotToPerformAssertions();
-		(new StringData(nullable: true))->validateValue(null);
+		$this->assertNull((new StringData(nullable: true))->importValue(null, $this->importer));
 	}
 
 	public function testDisallowNull(): void {
 		$this->expectException(InvalidValueType::class);
-		(new StringData)->validateValue(null);
+		(new StringData)->importValue(null, $this->importer);
 	}
 
 	public function testTooFewOk(): void {
-		$this->expectNotToPerformAssertions();
-		(new StringData(minLength: 3))->validateValue("123");
-		(new StringData(minLength: 3))->validateValue("1234");
+		$this->assertIsString((new StringData(minLength: 3))->importValue("123", $this->importer));
+		$this->assertIsString((new StringData(minLength: 3))->importValue("1234", $this->importer));
 	}
 
 	public function testTooFewError(): void {
 		$this->expectException(StringTooShort::class);
-		(new StringData(minLength: 3))->validateValue("12");
+		(new StringData(minLength: 3))->importValue("12", $this->importer);
 	}
 
 	public function testTooManyOk(): void {
-		$this->expectNotToPerformAssertions();
-		(new StringData(maxLength: 3))->validateValue("123");
-		(new StringData(maxLength: 3))->validateValue("12");
+		$this->assertIsString((new StringData(maxLength: 3))->importValue("123", $this->importer));
+		$this->assertIsString((new StringData(maxLength: 3))->importValue("12", $this->importer));
 	}
 
 	public function testTooManyError(): void {
 		$this->expectException(StringTooLong::class);
-		(new StringData(maxLength: 3))->validateValue("1234");
+		(new StringData(maxLength: 3))->importValue("1234", $this->importer);
 	}
 
 	public function testInRange(): void {
 		$this->expectNotToPerformAssertions();
-		(new StringData(minLength: 1, maxLength: 3))->validateValue("12");
+		(new StringData(minLength: 1, maxLength: 3))->importValue("12", $this->importer);
 	}
 
 	public function testInEnum(): void {
 		$this->expectNotToPerformAssertions();
 		//No uniqueness requirement
-		(new StringData(enum: ["1", "2", "3"]))->validateValue("1");
+		(new StringData(enum: ["1", "2", "3"]))->importValue("1", $this->importer);
 	}
 
 	public function testNotInEnum(): void {
 		$this->expectException(StringNotInEnum::class);
-		(new StringData(enum: ["1", "2", "3"]))->validateValue("4");
+		(new StringData(enum: ["1", "2", "3"]))->importValue("4", $this->importer);
 	}
 
 	public function testDateTimeFormatOk(): void {
-		$this->expectNotToPerformAssertions();
 		//No uniqueness requirement
-		(new StringData(format: StringData::FORMAT_DATE_TIME))->validateValue("2000-01-01T12:00:00Z");
+		$this->assertIsString((new StringData(format: StringData::FORMAT_DATE_TIME))->importValue("2000-01-01T12:00:00Z", $this->importer));
 	}
 
 	public function testDateTimeFormatError(): void {
 		$this->expectException(StringIncorrectlyFormatted::class);
-		(new StringData(format: StringData::FORMAT_DATE_TIME))->validateValue("2000-01-03");
+		(new StringData(format: StringData::FORMAT_DATE_TIME))->importValue("2000-01-03", $this->importer);
 	}
 
 	public function testSkipUnknownFormat(): void {
-		$this->expectNotToPerformAssertions();
 		//No uniqueness requirement
-		(new StringData(format: 'unknown'))->validateValue("2000-01-01T12:00:00Z");
+		$this->assertIsString((new StringData(format: 'unknown'))->importValue("2000-01-01T12:00:00Z", $this->importer));
 	}
 
 	//@TODO - pattern
