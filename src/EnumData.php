@@ -18,12 +18,12 @@ use Walnut\Lib\DataType\Exception\ObjectType\UnsupportedObjectPropertyFound;
 final class EnumData implements DirectValue {
 	/**
 	 * @param class-string<T> $className
-	 * @param bool $isInteger
-	 * @param non-empty-list<string> $values
+	 * @param EnumDataType $type
+	 * @param non-empty-list<string>|non-empty-list<int> $values
 	 */
 	public function __construct(
 		public readonly string $className,
-		public readonly bool $isInteger,
+		public readonly EnumDataType $type,
 		public readonly array $values
 	) {}
 
@@ -35,14 +35,25 @@ final class EnumData implements DirectValue {
 	public function importValue(
 		null|string|float|int|bool|array|object $value
 	): object {
-		if ($this->isInteger && !is_int($value)) {
+		if ($this->type === EnumDataType::INT && !is_int($value)) {
 			throw new InvalidValueType('int enum', gettype($value));
 		}
-		if (!$this->isInteger && !is_string($value)) {
+		if ($this->type === EnumDataType::STRING && !is_string($value)) {
 			throw new InvalidValueType('string enum', gettype($value));
 		}
-		return ($this->className)::tryFrom($value) ??
-			throw new StringNotInEnum($this->values, $value);
+		if ($this->type === EnumDataType::UNIT && !is_string($value)) {
+			throw new InvalidValueType('unit enum', gettype($value));
+		}
+		if ($this->type !== EnumDataType::UNIT) {
+			return ($this->className)::tryFrom($value) ??
+				throw new StringNotInEnum($this->values, (string)$value);
+		}
+		foreach(($this->className)::cases() as $case) {
+			if ($case->name === $value) {
+				return $case;
+			}
+		}
+		throw new StringNotInEnum($this->values, $value);
 	}
 
 }
