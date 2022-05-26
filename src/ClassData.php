@@ -17,7 +17,6 @@ use Walnut\Lib\DataType\Exception\ObjectType\UnsupportedObjectPropertyFound;
  * @readonly
  * @template T of object
  */
-#[Attribute(Attribute::TARGET_PROPERTY)]
 final class ClassData implements CompositeValue {
 	/**
 	 * @param class-string<T> $className
@@ -33,13 +32,13 @@ final class ClassData implements CompositeValue {
 	/**
 	 * @param string|float|int|bool|array|object|null $value
 	 * @param CompositeValueHydrator $nestedValueHydrator
-	 * @return ?T
+	 * @return T
 	 * @throws InvalidValueType|RequiredObjectPropertyMissing|TooFewObjectProperties|TooManyObjectProperties|UnsupportedObjectPropertyFound|InvalidValue|ReflectionException
 	 */
 	public function importValue(
 		null|string|float|int|bool|array|object $value,
 		CompositeValueHydrator $nestedValueHydrator
-	): ?object {
+	): object {
 		$values = $this->cleanValue($value);
 		return (new ReflectionClass($this->className))->newInstance(...
 			$this->importValues($values, $nestedValueHydrator)
