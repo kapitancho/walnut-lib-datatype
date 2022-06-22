@@ -16,8 +16,12 @@ use Walnut\Lib\DataType\Exception\StringType\StringTooShort;
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 final class StringData implements DirectValue {
-	public const DATE_TIME_REGEXP = '#^(\d+)-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+|\-]([01]\d|2[0-3])))$#';
+	private const DATE_REGEXP = '#^(\d+)-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3])$#';
+	private const DATE_TIME_REGEXP = '#^(\d+)-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):([0-5]\d):([0-5]\d|60)(\.\d+)?(([Zz])|([\+|\-]?([01]\d|2[0-3])(\:[0-5]\d)?))$#';
+	private const EMAIL_REGEXP = '#^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$#';
+	public const FORMAT_DATE = 'date';
 	public const FORMAT_DATE_TIME = 'date-time';
+	public const FORMAT_EMAIL = 'email';
 
 	/**
 	 * @param bool $nullable
@@ -92,12 +96,13 @@ final class StringData implements DirectValue {
 	 */
 	private function wrongFormat(string $value): self {
 		if (isset($this->format)) {
-			switch ($this->format) {
-				case self::FORMAT_DATE_TIME:
-					if (!preg_match(self::DATE_TIME_REGEXP, $value)) {
-						throw new StringIncorrectlyFormatted($this->format, $value);
-					}
-				break;
+			$regexp = [
+				self::FORMAT_DATE => self::DATE_REGEXP,
+				self::FORMAT_DATE_TIME => self::DATE_TIME_REGEXP,
+				self::FORMAT_EMAIL => self::EMAIL_REGEXP,
+			][$this->format] ?? null;
+			if ($regexp && !preg_match($regexp, $value)) {
+					throw new StringIncorrectlyFormatted($this->format, $value);
 			}
 		}
 		return $this;
