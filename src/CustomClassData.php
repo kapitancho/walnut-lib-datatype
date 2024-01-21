@@ -17,16 +17,14 @@ use Walnut\Lib\DataType\Exception\ObjectType\UnsupportedObjectPropertyFound;
  * @readonly
  * @template T of object
  */
-final class WrapperClassData implements CompositeValue {
+final class CustomClassData implements CompositeValue {
 	/**
 	 * @param class-string<T> $className
-	 * @param string $propertyName
-	 * @param DirectValue|CompositeValue|ClassRef $propertyValue
+	 * @param DirectValue $propertyValue
 	 */
 	public function __construct(
 		public readonly string $className,
-		public readonly string $propertyName,
-		public readonly DirectValue|CompositeValue|ClassRef $propertyValue
+		public readonly DirectValue $propertyValue
 	) {}
 
 	/**
@@ -38,11 +36,8 @@ final class WrapperClassData implements CompositeValue {
 	public function importValue(
 		null|string|float|int|bool|array|object $value,
 		CompositeValueHydrator $nestedValueHydrator
-	): object {
-		$value = $nestedValueHydrator->importNestedValue($value, $this->propertyValue);
-		$c = new ReflectionClass($this->className);
-		return $c->getConstructor()?->getParameters()[0]?->isVariadic() ? 
-			$c->newInstanceArgs($value) : $c->newInstance($value);			
+	): null|string|float|int|bool|array|object {
+		return $this->propertyValue->importValue($value);
 	}
 
 
